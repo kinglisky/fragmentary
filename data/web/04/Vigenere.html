@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Vigenere加解密</title>
+    <style>
+        * {
+            padding: 0;
+            margin: 0;
+        }
+        html {
+            width: 100%;
+            height: 100%;
+        }
+        body {
+            width: 100%;
+            height: 100%;
+            font-family: YouYuan;
+            line-height: 2em;
+            font-size: 16px;
+        }
+        h1 {
+            display: block;
+            text-align: center;
+            margin: 3% auto;
+        }
+        .wrapper {
+            padding: 3%;
+            border: 5px solid #000;
+            border-radius: 20px;
+            width: 20%;
+            float: left;
+            margin: 3% 0 0 2%;
+        }
+        .wrapper>label,
+        .wrapper>input {
+            width: 100%;
+            line-height: 2em;
+            display: block;
+            padding: 1%;
+            border-radius: 2px;
+        }
+        .wrapper>button {
+            border-radius: 5px;
+            border: 1px solid #268126;
+            display: block;
+            margin-top: 3%;
+            padding: 2% 3%;
+            background-color: #43ccc2;
+        }
+        #set_pw_table {
+            padding: 1%;
+            border: 5px solid #000;
+            border-radius: 20px;
+            width: 24%;
+            margin: 3% 0 0 2%;
+        }
+        #set_pw_table>label,
+        #set_pw_table>input {
+            display: block;
+            line-height: 2em;
+            width: 90%;
+        }
+        #set_pw_table>button {
+            text-align: center;
+            border-radius: 5px;
+            border: 1px solid #268126;
+            display: block;
+            margin-top: 3%;
+            padding: 2% 3%;
+            background-color: #43ccc2;
+        }
+        #pwtable {
+            line-height: 1em;
+            letter-spacing: 1em;
+            padding: 1%;
+            width: 30%;
+            height: 400px;
+            font-size: 3px;
+            overflow: auto;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>维吉利亚(Vigenere)密码加解密实现</h1>
+    <div id="set_pw_table">
+        <label for="setPtb">自定义替换表：</label>
+        <input type="text" id="setPtb">
+        <button id="setBtn">设置</button>
+    </div>
+    <div id="encryption" class="wrapper">
+        <label for="clear">明文:</label>
+        <input type="text" id="clear">
+        <label for="key">密钥:</label>
+        <input type="text" id="key">
+        <label for="cipher">密文:</label>
+        <input type="text" id="cipher">
+        <button id="encryptionBtn">加密</button>
+    </div>
+    <div id="decryption" class="wrapper">
+        <label for="dcipher">密文:</label>
+        <input type="text" id="dcipher">
+        <label for="dkey">密钥:</label>
+        <input type="text" id="dkey">
+        <label for="dclear">明文:</label>
+        <input type="text" id="dclear">
+        <button id="decryptionBtn">解密</button>
+    </div>
+    <div class="wrapper" id="pwtable">
+
+    </div>
+    <script>
+        (function () {
+            var Vigenere = {
+                    _strCpr: 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890._~!@#$%&^*)(_+=;:|\\"\'?>/.,<}][{ ',
+                    //可以将此字符串的顺序打乱点，或者添加更多字符,生成更加复杂的代换表。
+                    _strKey: function (strK, str) {
+                        //生成密钥字符串,strK为密钥，str为明文或者密文
+
+                        var lenStrK = strK.length;
+
+                        var lenStr = str.length;
+
+                        if (lenStrK != lenStr) {
+                            //如果密钥长度与str不同，则需要生成密钥字符串
+
+                            if (lenStrK < lenStr) {
+                                //如果密钥长度比str短，则以不断重复密钥的方式生成密钥字符串
+
+                                while (lenStrK < lenStr) {
+                                    strK +=strK;
+                                    lenStrK = 2 * lenStrK;
+
+                                }
+
+                            }
+                            //此时，密钥字符串的长度大于或等于str长度
+                            strK = strK.substring(0, lenStr);
+                            //将密钥字符串截取为与str等长的字符串
+                        }
+                        return strK;
+
+                    }
+
+                }
+                /*Vigenere.lenCpr为替换字符串的长度*/
+            Vigenere.lenCpr = Vigenere._strCpr.length;
+
+            Vigenere.Encrypt = function (K, P) {
+                //加密算法，K为密钥，P为明文
+                K = Vigenere._strKey(K, P);
+
+                var lenK = K.length;
+
+                var rlt = '';
+
+                var loop = 0;
+
+                for (loop = 0; loop < lenK; loop++) {
+                    /*首先都要判断明文字符与密钥字符串是否位于替换字符串中*/
+                    var iP = Vigenere._strCpr.indexOf(P.charAt(loop));
+
+                    if (iP == -1) return '本算法暂时不能对字符：' + P.charAt(loop) + '进行加密';
+
+                    var iK = Vigenere._strCpr.indexOf(K.charAt(loop));
+
+                    if (iK == -1) return '密钥中包含非法字符：' + K.charAt(loop);
+                    /*利用取模代替查找表，效率更高*/
+                    var i = (iP + iK) % Vigenere.lenCpr;
+                    /*将字符串进行拼接*/
+                    rlt = rlt + Vigenere._strCpr.charAt(i);
+
+                }
+
+                return rlt;
+
+            };
+
+            Vigenere.DisEncrypt = function (K, C) {
+                /*重新生成密钥*/
+                K = Vigenere._strKey(K, C);
+                var lenK = K.length;
+                var rlt = '';
+                var loop = 0;
+                for (loop = 0; loop < lenK; loop++) {
+                    /*同理都要判断密文字符与密钥字符串是否位于替换字符串中*/
+                    var iK = Vigenere._strCpr.indexOf(K.charAt(loop));
+
+                    if (iK == -1) return '密钥中包含非法字符：' + K.charAt(loop);
+
+                    var iC = Vigenere._strCpr.indexOf(C.charAt(loop));
+                    /* 解密就是加密的逆向过程， 既减去密钥的过程， 当然其是一代换字符的长为模进行想减的， 当密文字符不够减时应加上一个模长 */
+                    if (iK > iC) {
+                        rlt += Vigenere._strCpr.charAt(iC + Vigenere.lenCpr - iK);
+
+                    } else {
+                        rlt += Vigenere._strCpr.charAt(iC - iK);
+
+                    }
+
+                }
+                return rlt;
+            };
+            /* -----------------------------------核心事件驱动------------------------------ */
+            /* 按键 */
+            var setPtb = document.getElementById('setPtb'),
+                setBtn = document.getElementById('setBtn'),
+                pwtable = document.getElementById('pwtable');
+            /* buildPtd用于显示字典的 */
+            var buildPtb = function (pws) {
+                var len = pws.length,
+                    html = "";
+                for (var i = 0; i < len; i++) {
+                    html += pws.substring(i);
+                    html += pws.substring(0, i);
+                    html += "<br>";
+                }
+                return html;
+            };
+            /* 初始化显示的默认字典 */
+            setPtb.value = Vigenere._strCpr;
+            pwtable.innerHTML = buildPtb(Vigenere._strCpr);
+            /* 用于设置默认字典 */
+            setBtn.addEventListener('click', function () {
+                if (setPtb.value) {
+                    Vigenere._strCpr = setPtb.value;
+                    Vigenere.lenCpr = Vigenere._strCpr.length;
+                    pwtable.innerHTML = buildPtb(Vigenere._strCpr);
+                }
+            });
+            /* 获取input输入文本框和按键组件 */
+            var clear = document.getElementById('clear'),
+                key = document.getElementById('key'),
+                cipher = document.getElementById('cipher'),
+                encryptionBtn = document.getElementById('encryptionBtn');
+            var dclear = document.getElementById('dclear'),
+                dkey = document.getElementById('dkey'),
+                dcipher = document.getElementById('dcipher'),
+                decryptionBtn = document.getElementById('decryptionBtn');
+            /* 事件监听加密 */
+            encryptionBtn.addEventListener('click', function () {
+                /* 获取文本框的明文与密钥进行加密， 并将密文与密钥传递给解密文本框 */
+                var clearText = clear.value,
+                    keyText = key.value,
+                    cipherText = "";
+                /* 利用 * Vigenere.Encrypt方法进行加密 */
+                cipherText = Vigenere.Encrypt(keyText, clearText);
+                dcipher.value = cipher.value = cipherText;
+                dkey.value = keyText;
+
+
+            });
+            /* 事件监听解密 */
+            decryptionBtn.addEventListener('click', function () {
+                /* 利用Vigenere.DisEncrypt方法进行解密 */
+                dclear.value = Vigenere.DisEncrypt(dkey.value, dcipher.value);
+            });
+        })();
+    </script>
+</body>
+</html>

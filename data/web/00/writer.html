@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+
+<head>
+    <meta charset="UTF-8">
+    <title>打字效果</title>
+    <script src="xmlHttpObj.js"></script>
+</head>
+<style>
+    * {
+        padding: 0;
+        margin: 0;
+    }
+    html {
+        width: 100%;
+        height: 100%;
+    }
+    body {
+        width: 90%;
+        height: 100%;
+        margin: 0 auto;
+        font-family: "YouYuan", "Lucida Grande", Lucida Sans Unicode, Hiragino Sans GB, WenQuanYi Micro Hei, Verdana, Aril, sans-serif;
+        line-height: 2em;
+        background: url(./29.jpg);
+        color: #d8d8d8;
+    }
+    h1 {
+        display: block;
+        text-align: center;
+        margin: 3% auto;
+    }
+    #wrapper {
+        /*        text-align: center;*/
+        width: 40%;
+        border: 10px solid rgba(129, 127, 127, 0.5);
+        border-radius: 20px;
+        margin: 3% auto;
+        padding: 4%;
+        /*        text-indent: 2em;*/
+        color: #d8d8d8;
+        /*保持文档原有的换行格式等*/
+        white-space: pre;
+        resize: both;
+        /*配hidden使用*/
+        overflow: hidden;
+    }
+    textarea {
+        width: 30%;
+        resize: both;
+    }
+</style>
+
+<body>
+    <header>
+        <h1>打字效果</h1>
+    </header>
+    <div id="wrapper">
+    </div>
+    <!--    <textarea name="" id="" cols="30" rows="10"></textarea>-->
+</body>
+<script>
+    (function () {
+        var wrapper = document.getElementById('wrapper');
+        var text, i = 0,
+            len, time, setTime;
+        var j = 0;
+        var randomTime;
+        getHtml();
+
+        function getHtml() {
+            var url = "jimi.txt";
+            xmlHttpObj = getXmlHttp();
+            if (!xmlHttpObj) {
+                return;
+            } else {
+                //        alert("zai zhe ne");
+                xmlHttpObj.open('GET', url, true);
+                xmlHttpObj.onreadystatechange = resultHtml;
+                xmlHttpObj.send(null);
+            }
+        }
+
+        function resultHtml() {
+            if (xmlHttpObj.readyState == 4 && xmlHttpObj.status == 200) {
+                var htmldiv = document.getElementById("body");
+                text = xmlHttpObj.responseText;
+                //                text=decodeURI(encodeURI(text).replace(/%0A/g,"<br>"));
+                len = text.length;
+                time = 80;
+                readText();
+                //                writeWait();
+            }
+
+        }
+
+        function readText() {
+            randomTime = Math.floor(Math.random() * 300) + 50;
+            wrapper.innerHTML = text.slice(0, i++) + "_";
+            if (i > 100) i = 0;
+            setTime = setTimeout(readText, randomTime);
+
+        }
+
+        function writeWait() {
+            if (j++ % 2 == 0) {
+                wrapper.innerHTML = text.slice(0, i) + "_";
+            } else {
+                wrapper.innerHTML = text.slice(0, i) + " ";
+            }
+            setTimeout(writeWait, 500);
+        }
+
+        function getXmlHttp() {
+            var xmlhttp = null;
+            if (window.XMLHttpRequest) {
+                xmlhttp = new XMLHttpRequest();
+            } else {
+                try {
+                    xmlhttp = new ActiveXObject("Msxml2.XMLHTTP");
+                } catch (e) {
+                    try {
+                        xml = new ActiveXObject("Microsoft.XMLHTTP");
+                    } catch (e) {
+                        return xmlhttp;
+                    }
+                }
+            }
+            return xmlhttp;
+        }
+    })();
+</script>
+
+</html>

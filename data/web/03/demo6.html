@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>canvas</title>
+</head>
+<style>
+    * {
+        padding: 0;
+        margin: 0;
+    }
+    html {
+        width: 100%;
+        height: 100%;
+    }
+    body {
+        width: 100%;
+        height: 100%;
+        line-height: 2em;
+        font-family: YouYuan;
+        font-size: 14px;
+    }
+    video {
+        width: 800px;
+        border: 5px solid #000;
+        margin: 5% auto;
+        display: block;
+    }
+    canvas {
+        display: block;
+    }
+</style>
+
+<body>
+    <canvas id="canvas1" width="800" height="600">
+
+    </canvas>
+    <script src="script/jquery-2.1.1.min.js"></script>
+</body>
+<script>
+    $(document).ready(function () {
+        var $canvas = $('#canvas1'),
+            winW = $(window).get(0).innerWidth,
+            winH = $(window).get(0).innerHeight;
+        var context = $canvas.get(0).getContext('2d');
+        $canvas.attr({
+            "width": winW,
+            "height": winH
+        }).css({
+            backgroundColor: "#000"
+        });
+        var points = {},
+            SCALE = 3,
+            x = -1,
+            y = -1,
+            color = ["#072933", "#2e4045", "#8c593b", "#b2814e", "#fac268", "#fad237"];
+        var selected = false;
+        var loadDemo = function () {
+            context.globalAlpha = 0.2;
+            context.globalCompositeOperation = "lighter";
+            /*当鼠标在某一点停留太久时，坚强画笔效果*/
+            function sample() {
+                if (selected) {
+                    if (x != -1) {
+                        addPoint(x, y);
+                    }
+                }
+                setTimeout(sample, 300);
+            }
+            $canvas.on('mousedown', function (e) {
+                selected = true;
+            });
+            $canvas.on('mouseup', function (e) {
+                selected = false;
+            });
+            $canvas.on('mousemove', function (e) {
+                if (selected) {
+                    var canvasOffset = $canvas.offset();
+                    x = Math.floor(event.pageX - canvasOffset.left),
+                    y = Math.floor(event.pageY - canvasOffset.top);
+                    addPoint(x, y);
+                }
+            });
+            sample();
+        };
+        var addPoint = function (x, y) {
+            /*先除以scale*/
+            x = Math.floor(x / SCALE);
+            y = Math.floor(y / SCALE);
+            if (!points[[x, y]]) {
+                points[[x, y]] = 1;
+            } else if (points[[x, y]] == 10) {
+                return;
+            } else {
+                points[[x, y]]++;
+            }
+            //            console.log(points);
+            /*而后又乘以scal*/
+            drawPoint(x * SCALE, y * SCALE, points[[x, y]]);
+        };
+        var drawPoint = function (x, y, radius) {
+            context.fillStyle = getColor(radius);
+            /*画笔粗细*/
+            radius = Math.sqrt(radius) * 6;
+            context.beginPath();
+            context.arc(x, y, radius, 0, Math.PI * 2, true);
+            context.closePath();
+            context.fill();
+        };
+        var getColor = function (intensity) {
+            return color[Math.floor(intensity / 2)];
+        };
+        loadDemo();
+
+    })
+</script>
+
+</html>

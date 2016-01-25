@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>canvas</title>
+</head>
+<style>
+    * {
+        padding: 0;
+        margin: 0;
+    }
+    html {
+        width: 100%;
+        height: 100%;
+    }
+    body {
+        width: 100%;
+        height: 100%;
+        line-height: 2em;
+        font-family: YouYuan;
+        font-size: 14px;
+    }
+    video {
+        width: 800px;
+        border: 5px solid #000;
+        margin: 5% auto;
+        display: block;
+    }
+    canvas {
+        display: block;
+        margin: 5% auto;
+        border: 5px solid #000;
+        /*        border-radius: 20px;*/
+    }
+    .btns {
+        width: 800px;
+        margin: 3% auto;
+    }
+    .btns>button {
+        padding: 1% 2%;
+        border-radius: 5px;
+        background-color: #17bc6a;
+    }
+</style>
+
+<body>
+    <video id="myvideo" controls="controls">
+        <source src="1.mp4" type="video/mp4">
+            浏览器不支持的视屏格式
+    </video>
+    <div class="btns">
+        <button id="play">播放</button>
+        <button id="stop">停止</button>
+    </div>
+    <canvas id="canvas1" width="800" height="450">
+
+    </canvas>
+    <script src="script/jquery-2.1.1.min.js"></script>
+</body>
+<script>
+    $(document).ready(function () {
+        var canvas = $('#canvas1');
+        var video = $('#myvideo');
+        var context = canvas.get(0).getContext("2d");
+        $('#play').click(function () {
+            video.get(0).play();
+        });
+        $('#stop').click(function () {
+            video.get(0).pause();
+        });
+        video.bind('play', function () {
+            drawCanvas();
+        });
+        var cw = canvas.width(),
+            ch = canvas.height();
+        var row = 100,
+            col = 100;
+        var imgWith = cw,
+            imgHeight = ch;
+
+        var tw = imgWith / col,
+            th = imgHeight / row;
+
+        function drawCanvas() {
+            if (video.get(0).paused || video.get(0).ended) return false;
+            context.drawImage(video.get(0), 0, 0, 800, 450);
+            var imgData = context.getImageData(0, 0, cw, ch);
+            var px = imgData.data;
+            context.clearRect(0, 0, cw, ch);
+            for (var r = 0; r < row; r++) {
+                for (var c = 0; c < col; c++) {
+                    var x = (c * tw) + tw / 2;
+                    var y = r * th + th / 2;
+                    var pos = (Math.floor(y) * imgWith * 4) + (Math.floor(x) * 4);
+                    var red = px[pos];
+                    var green = px[pos + 1];
+                    var blue = px[pos + 2];
+                    context.fillStyle = "rgb(" + red + "," + green + "," + blue + ")";
+//                    context.fillRect(x - tw / 2, y - th / 2, tw, th);
+                    /*原点效果*/
+                    context.beginPath();
+                    context.arc(x, y, tw / 2, 0, Math.PI * 2, false);
+                    context.closePath();
+                    context.fill();
+                }
+            }
+            setTimeout(drawCanvas,10);
+
+        }
+    });
+</script>
+
+</html>

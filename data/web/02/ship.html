@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>加速度-行星</title>
+    <link rel="stylesheet" href="style/pub.css">
+    <style>
+        canvas {
+            border: 1px solid #000;
+            display: block;
+            background-color: #000;
+        }
+    </style>
+</head>
+
+<body>
+    <canvas width="800" height="600"></canvas>
+    <script src="util/utils.js"></script>
+    <script src="class/ship.js"></script>
+    <script>
+        (function () {
+            var canvas = document.querySelector('canvas'),
+                context = canvas.getContext('2d'),
+                cw = canvas.width=document.body.offsetWidth,
+                ch = canvas.height=document.body.offsetHeight,
+                ship = new Ship();
+            var vr = 0,
+                vx = 0,
+                vy = 0,
+                thrust = 0;
+            ship.x = cw / 2;
+            ship.y = ch / 2;
+            ship.draw(context);
+            window.addEventListener("keydown", function (event) {
+                switch (event.keyCode) {
+                case 37:
+                    vr = -3;
+                    break; //left
+                case 39:
+                    vr = 3;
+                    break; //right
+                case 38:
+                    thrust = 0.08;
+                    ship.showFlame = true;
+                    break; //up
+                }
+            }, false);
+            window.addEventListener("keyup", function (event) {
+                vr=0;
+                thrust=0;
+                ship.showFlame=false;
+            }, false);
+            (function drawFrame(){
+                window.requestAnimationFrame(drawFrame,canvas);
+                context.clearRect(0,0,cw,ch);
+                ship.rotation+=vr*Math.PI/180;
+                var angle=ship.rotation,
+                    ax=Math.cos(angle)*thrust,
+                    ay=Math.sin(angle)*thrust;
+                vx+=ax;
+                vy+=ay;
+                ship.x+=vx;
+                ship.y+=vy;
+                if(ship.x>cw||ship.x<0){
+                    ship.x=(ship.x+cw)%cw;
+                }
+                if(ship.y>ch||ship.y<0){
+                    ship.y=(ship.y+ch)%ch;
+                }
+                ship.draw(context);
+            }());
+
+
+        })();
+    </script>
+</body>
+
+</html>
