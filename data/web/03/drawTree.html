@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>new Tree</title>
+</head>
+<style>
+    * {
+        padding: 0;
+        margin: 0;
+    }
+    html {
+        width: 100%;
+        height: 100%;
+    }
+    body {
+        width: 100%;
+        height: 100%;
+        line-height: 2em;
+    }
+    canvas {
+        /*        color: rgb(187, 247, 46);*/
+        display: block;
+    }
+</style>
+
+<body>
+    <canvas id="mycanvas" width="1000" height="600"></canvas>
+    <script src="script/jquery-2.1.1.min.js"></script>
+</body>
+<script>
+    $(document).ready(function () {
+        var winWidth = $(window).get(0).innerWidth,
+            winHeight = $(window).get(0).innerHeight;
+        var canvas = $("#mycanvas"),
+            context = canvas.get(0).getContext('2d');
+        canvas.attr({
+            "width": winWidth,
+            "height": winHeight
+        }).css({
+            backgroundColor: "#fff"
+        });
+        var drawTree = function (ctx, node) {
+            ctx.shadowColor = node.shadwColor;
+            ctx.strokeStyle = node.shadwColor;
+            ctx.shadowBlur = node.shadwBlur;
+            ctx.beginPath();
+            ctx.moveTo(node.startx, node.starty);
+            ctx.lineCap = "round";
+            ctx.lineWidth = node.branchWidth;
+            ctx.lineTo(node.endx, node.endy);
+            ctx.stroke();
+
+        };
+        var nodes = [];
+        var sin = Math.sin,
+            cos = Math.cos,
+            rand = Math.random,
+            maxAngle = Math.PI / 2,
+            maxBranch = 3;
+        /*预计算减轻浏览器负担*/
+        var proNode = function (startx, starty, length, angle, depth, branchWidth) {
+            if (!depth) {
+                return;
+            }
+            var node = {},
+                endx = startx + length * cos(angle),
+                endy = starty + length * sin(angle);
+
+            node.startx = startx;
+            node.starty = starty;
+            node.endx = endx;
+            node.endy = endy;
+            node.branchWidth = branchWidth;
+            if (depth <= 5) {
+                node.shadwColor = "rgb(" + (((rand() * 125) + 115) >> 0) + "," + (((rand() * 55) + 200) >> 0) + "," + (((rand() * 50) + 0) >> 0) + ")";
+                node.shadowBlur = 100;
+
+            } else {
+                node.shadwColor = "rgb(" + (((rand() * 64) + 64) >> 0) + ",50,25)";
+                node.shadowBlur = 30;
+            }
+            nodes.push(node);
+            var newDepth = depth - 1,
+                newAngle,
+                newLength,
+                subBranches = (rand() * (maxBranch - 1)) + 1;
+            branchWidth *= 0.7;
+            for (var i = 0; i < subBranches; i++) {
+                newAngle = angle + rand() * maxAngle - maxAngle * 0.5;
+                newLength = length * (0.7 + rand() * 0.3);
+                proNode(endx, endy, newLength, newAngle, newDepth, branchWidth);
+            }
+        }
+        proNode((winWidth / 2) >> 0, (winHeight - 15) >> 0, 100, -Math.PI / 2, 12, 5);
+        var len = nodes.length,h=0;
+        var indraw=function(){
+            drawTree(context, nodes[h++]);
+            setTimeout(indraw,1);
+        };
+        indraw();
+    });
+</script>
+
+</html>

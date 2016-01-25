@@ -17,6 +17,8 @@
 
 * [画板涂鸦灼烧效果](http://kinglisky.github.io/fragmentary/data/web/03/demo6.html)
 
+* [canvas生成好看的树枝](http://kinglisky.github.io/fragmentary/data/web/03/drawTree.html)
+
 * [维吉尼亚加解密](http://kinglisky.github.io/fragmentary/data/web/04/Vigenere.html)
 
 
@@ -37,4 +39,14 @@
 * [画板 ](http://kinglisky.github.io/fragmentary/data/flash/swf/1.swf)
 
 * [彩带飘舞 ](http://kinglisky.github.io/fragmentary/data/flash/swf/2.swf)
+
+* [鼠标跟随效果 ](http://kinglisky.github.io/fragmentary/data/flash/swf/3.swf)
+
+* [数据筛选器 ](http://kinglisky.github.io/fragmentary/data/flash/swf/4.swf)
+
+* [新闻显示效果 ](http://kinglisky.github.io/fragmentary/data/flash/swf/5.swf)
+
+* [RSS阅读器 ](http://kinglisky.github.io/fragmentary/data/flash/swf/6.swf)
+
+* [平铺式相册 ](http://kinglisky.github.io/fragmentary/data/flash/swf/7.swf)
 
